@@ -18,9 +18,7 @@ namespace EnhancedReanimation
 			//.text: 000000014078602A cmp eax, 800000h
 			//.text: 000000014078602F jz short loc_1407860A7
 
-			for (uintptr_t i = START; i < END; ++i) {
-				REL::WriteSafeData(target.address() + i, REL::NOP);
-			}
+			REL::WriteSafeFill(target.address() + START, REL::NOP, END - START);
 		}
 	}
 
@@ -51,17 +49,20 @@ namespace EnhancedReanimation
 				return EventResult::kContinue;
 			}
 
-			if (const auto player = RE::PlayerCharacter::GetSingleton(); player) {
+			if (const auto player = RE::PlayerCharacter::GetSingleton()) {
 				const auto process = player->currentProcess;
 				const auto middleHigh = process ? process->middleHigh : nullptr;
 
 				if (middleHigh) {
+					const auto pcWorldLoc = player->GetWorldLocation();
+
 					for (auto& commandedActorData : middleHigh->commandedActors) {
 						const auto zombie = commandedActorData.commandedActor.get();
-						if (zombie && zombie->GetLifeState() == RE::ACTOR_LIFE_STATE::kReanimate && !zombie->IsAMount()) {
-							const auto distance = player->GetPosition().GetSquaredDistance(zombie->GetPosition());
-							if (distance > followDistSquared) {
-								zombie->MoveTo(player);
+						if (zombie && zombie->GetLifeState() == RE::ACTOR_LIFE_STATE::kReanimate) {
+							if (!zombie->IsBeingRidden()) {
+								if (const auto zombieWorldLoc = zombie->GetWorldLocation(); zombieWorldLoc.GetSquaredDistance(pcWorldLoc) >= followDistSquared) {
+									zombie->MoveTo(player);
+								}
 							}
 						}
 					}
@@ -144,10 +145,11 @@ namespace EnhancedReanimation
 						return;
 					}
 					dummyKYWD->SetFormEditorID("DummyHorseReanimate");
+
 					dataHandler->GetFormArray<RE::BGSKeyword>().push_back(dummyKYWD);
 
 					for (const auto& race : dataHandler->GetFormArray<RE::TESRace>()) {
-						if (race && REX::STR::ICONTAINS(race->GetName(), "Horse")) {
+						if (race && REX::STR::ICONTAINS(race->GetFormEditorID(), "Horse")) {
 							if (auto index = race->GetKeywordIndex(reanimateKYWD)) {
 								race->keywords[*index] = dummyKYWD;
 							}
@@ -168,9 +170,10 @@ namespace EnhancedReanimation
 			//.text : 0000000140360F72 cmp edx, 4
 			//.text : 0000000140360F75 jz loc_14036161D
 
-			for (uintptr_t i = START; i < END; ++i) {
-				REL::WriteSafeData(target.address() + i, REL::NOP);
-			}
+			//.text: 00000001403C092E cmp edx, 800000h
+			//.text: 00000001403C0934 jz loc_1403C06FF
+
+			REL::WriteSafeFill(target.address() + START, REL::NOP, END - START);
 		}
 	}
 
