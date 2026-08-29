@@ -19,7 +19,7 @@ namespace EnhancedReanimation
 			//.text: 000000014078602F jz short loc_1407860A7
 
 			for (uintptr_t i = START; i < END; ++i) {
-				REL::safe_write(target.address() + i, REL::NOP);
+				REL::WriteSafeData(target.address() + i, REL::NOP);
 			}
 		}
 	}
@@ -147,7 +147,7 @@ namespace EnhancedReanimation
 					dataHandler->GetFormArray<RE::BGSKeyword>().push_back(dummyKYWD);
 
 					for (const auto& race : dataHandler->GetFormArray<RE::TESRace>()) {
-						if (race && string::icontains(race->GetName(), "Horse")) {
+						if (race && REX::STR::ICONTAINS(race->GetName(), "Horse")) {
 							if (auto index = race->GetKeywordIndex(reanimateKYWD)) {
 								race->keywords[*index] = dummyKYWD;
 							}
@@ -169,7 +169,7 @@ namespace EnhancedReanimation
 			//.text : 0000000140360F75 jz loc_14036161D
 
 			for (uintptr_t i = START; i < END; ++i) {
-				REL::safe_write(target.address() + i, REL::NOP);
+				REL::WriteSafeData(target.address() + i, REL::NOP);
 			}
 		}
 	}
@@ -181,17 +181,17 @@ namespace EnhancedReanimation
 
 		if (settings->decapitateCheck) {
 			DecapitateCheck::Install();
-			logger::info("Installed reanimate decapitated NPCs patch");
+			REX::INFO("Installed reanimate decapitated NPCs patch");
 		}
 		if (settings->npcCombat) {
 			NPCCombatCast::Install();
-			logger::info("Installed reanimated necromancer cast patch");
+			REX::INFO("Installed reanimated necromancer cast patch");
 		}
 		if (settings->rideHorse) {
 			Riding::Install();
 			Riding::Name::Install();
 			Riding::StolenTag::Install();
-			logger::info("Installed horse riding patch");
+			REX::INFO("Installed horse riding patch");
 		}
 	}
 
@@ -200,12 +200,11 @@ namespace EnhancedReanimation
 		const auto settings = Settings::GetSingleton();
 		if (settings->patchHorse) {
 			Riding::RaceReanimateCheck::Install();
-
-			logger::info("Installed horse reanimation patch");
+			REX::INFO("Installed horse reanimation patch");
 		}
 		if (settings->fastTravel) {
 			FastTravel::Register();
-			logger::info("Installed fast travel fix");
+			REX::INFO("Installed fast travel fix");
 		}
 	}
 }

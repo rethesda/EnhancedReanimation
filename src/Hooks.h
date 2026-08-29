@@ -16,30 +16,15 @@ namespace EnhancedReanimation
 	{
 		using EventResult = RE::BSEventNotifyControl;
 
-	    class LocationChangeHandler final :
+		class LocationChangeHandler final :
+			public REX ::TSingleton<LocationChangeHandler>,
 			public RE::BSTEventSink<RE::MenuOpenCloseEvent>
 		{
-		public:
-			[[nodiscard]] static LocationChangeHandler* GetSingleton()
-			{
-				static LocationChangeHandler singleton;
-				return std::addressof(singleton);
-			}
-
 		protected:
 			EventResult ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override;
 
 		private:
-			LocationChangeHandler() = default;
-			LocationChangeHandler(const LocationChangeHandler&) = delete;
-			LocationChangeHandler(LocationChangeHandler&&) = delete;
-
-			~LocationChangeHandler() override = default;
-
-			LocationChangeHandler& operator=(const LocationChangeHandler&) = delete;
-			LocationChangeHandler& operator=(LocationChangeHandler&&) = delete;
-
-			static inline float followDistSquared = 160000.0f;
+			static inline constexpr float followDistSquared = 160000.0f;
 		};
 
 		void Register();
